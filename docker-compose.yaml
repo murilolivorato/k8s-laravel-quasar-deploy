@@ -1,0 +1,137 @@
+networks:
+  laravel_gke_deploy:
+
+services:
+  server:
+    image: 'nginx:stable-alpine'
+    #ulimits:
+      #nofile:
+        #soft: 1048576
+        #hard: 1048576
+    #deploy:
+      #resources:
+        #limits:
+          #cpus: '1'
+          #memory: '2G'
+    build:
+      context: .
+      dockerfile: dockerfiles/nginx.dockerfile
+    ports:
+      - 80:80
+      # - 443:443
+    volumes:
+      - ./src:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - php
+      - postgres
+      - redis
+    container_name: laravel_gke_deploy
+    networks:
+      - laravel_gke_deploy
+  postgres:
+    image: postgres:15.3-alpine
+    container_name: postgres_laravel_gke
+    restart: always
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
+    # or set shared memory limit when deploy via swarm stack
+    #volumes:
+    #  - type: tmpfs
+    #    target: /dev/shm
+    #    tmpfs:
+    #      size: 134217728 # 128*2^20 bytes = 128Mb
+    environment:
+      - POSTGRES_DB=laravel_gke_db
+      - POSTGRES_USER=test_user
+      - POSTGRES_PASSWORD=pwd
+    ports:
+      - "5432:5432"
+    volumes:
+      - /opt/postgres_data:/var/lib/postgresql/data
+    networks:
+      - laravel_gke_deploy
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin_laravel_gke_deploy
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user@localhost.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    user: '$UID:$GID'
+    ports:
+      - 8888:80
+    volumes:
+      - /opt/pgadmin_data:/var/lib/pgadmin
+    networks:
+      - laravel_gke_deploy
+
+  php:
+    build:
+      context: .
+      dockerfile: dockerfiles/php.dockerfile
+    volumes:
+      - ./src:/var/www/html:delegated
+    container_name: php_laravel_gke_deploy
+    networks:
+      - laravel_gke_deploy
+    depends_on:
+      - postgres
+
+  redis:
+    image: redis:alpine
+    container_name: redis_gke_deploy
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    networks:
+      - laravel_gke_deploy
+    command: redis-server --appendonly yes --replica-read-only no
+
+  composer:
+    build:
+      context: ./dockerfiles
+      dockerfile: composer.dockerfile
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - php
+    networks:
+      - laravel_gke_deploy
+  artisan:
+    build:
+      context: .
+      dockerfile: dockerfiles/php.dockerfile
+    volumes:
+      - ./src:/var/www/html
+    entrypoint: ["php", "/var/www/html/artisan"]
+    #depends_on:
+    networks:
+      - laravel_gke_deploy
+    depends_on:
+    - php
+  scheduler:
+    build:
+      context: .
+      dockerfile: dockerfiles/php.dockerfile
+    container_name: scheduler_laravel_gke_deploy
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+    entrypoint: [ "php", "artisan", "schedule:work" ]
+    networks:
+      - laravel_gke_deploy
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mail_gke_deploy
+    ports:
+      - 1025:1025
+      - 8025:8025
+    networks:
+      - laravel_gke_deploy
+
+
+
+

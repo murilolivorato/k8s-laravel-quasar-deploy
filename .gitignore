@@ -1,0 +1,17 @@
+/src/node_modules
+/src/public/hotjen
+/src/public/assets/temp
+/docker_volumes
+/src/storage/app
+/src/storage/keys
+/src/storage/logs
+/src/storage/*.key
+/src/vendor
+/src/src/.env
+/src/.phpunit.result.cache
+/src/Homestead.json
+/src/Homestead.yaml
+/src/npm-debug.log
+/src/yarn-error.log
+/.idea
+/.vscode
