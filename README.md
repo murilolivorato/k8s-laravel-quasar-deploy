@@ -21,17 +21,10 @@ gcloud artifacts repositories create gke-deploy \
 # check region 
 gcloud config list
 
-# create repos in artifact
-gcloud artifacts repositories create gke-deploy \
---repository-format=docker \
---location=us-central1
-
 # TAG THE IMAGES FOR GCR
 docker build -t us-central1-docker.pkg.dev/curso-gcp-420816/gke-deploy/laravel_gke_deploy:v5 -f DockerFile.prod .
 # LIST IMAGE
 docker images | grep laravel_gke_deploy
-
-Push Docker Images to GCR:
 
 # Authenticate with Google Cloud
 gcloud auth configure-docker
