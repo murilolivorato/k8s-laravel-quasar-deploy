@@ -20,6 +20,10 @@ gcloud config list
 # TAG THE IMAGES
 docker build -t kube-laravel-app:v3 -f DockerFile.prod .
 docker build -t kube-laravel-app:v4 -f DockerFile.prod .
+
+docker build -t us-central1-docker.pkg.dev/curso-gcp-420816/gke-deploy/laravel_gke_deploy:v9 -f DockerFile.prod .
+
+
 # LIST IMAGE
 docker images | grep kube-laravel-app
 
@@ -32,4 +36,6 @@ docker run -p 8080:8080 laravel_gcr_deploy:test
 gcloud auth configure-docker
 
 # Push the images to GCR
-docker push us-central1-docker.pkg.dev/curso-gcp-420816/gke-deploy/laravel_gke_deploy:v5
+docker push us-central1-docker.pkg.dev/curso-gcp-420816/gke-deploy/laravel_gke_deploy:v9
+
+

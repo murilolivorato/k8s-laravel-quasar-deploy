@@ -29,7 +29,7 @@ spec:
               mountPath: /etc/nginx/nginx.conf
               readOnly: true
         - name: app
-          image: us-central1-docker.pkg.dev/curso-gcp-420816/gke-deploy/laravel_gke_deploy:v4
+          image: us-central1-docker.pkg.dev/curso-gcp-420816/gke-deploy/laravel_gke_deploy:v9
           imagePullPolicy: Always
           envFrom:
             - secretRef:
