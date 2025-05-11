@@ -16,7 +16,7 @@ RUN apk add --no-cache --virtual build-essentials \
     docker-php-ext-install opcache && \
     docker-php-ext-install exif && \
     docker-php-ext-install zip && \
-    apk del build-essentials && rm -rf /usr/src/php*
+    apk del build-essentials && rm -rf /usr/backend/php*
 
 # Install ImageMagick
 RUN apk add --update --no-cache autoconf g++ imagemagick imagemagick-dev libtool make pcre-dev \
@@ -29,8 +29,8 @@ COPY --from=composer:2.7.7 /usr/bin/composer /usr/bin/composer
 
 FROM base AS deps
 
-COPY src/composer.json /var/www/html/composer.json
-COPY src/composer.lock /var/www/html/composer.lock
+COPY backend/composer.json /var/www/html/composer.json
+COPY backend/composer.lock /var/www/html/composer.lock
 
 RUN composer install --no-dev --no-autoloader --no-scripts
 
@@ -45,7 +45,7 @@ COPY docker/nginx.conf /etc/nginx/http.d/default.conf
 # Copy supervisor configuration
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-COPY --chown=www-data:www-data src/ /var/www/html
+COPY --chown=www-data:www-data backend/ /var/www/html
 COPY --chown=www-data:www-data --from=deps /var/www/html/vendor /var/www/html/vendor
 
 RUN composer dump-autoload --optimize

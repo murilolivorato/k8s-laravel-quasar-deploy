@@ -6,6 +6,6 @@ COPY nginx/default.conf .
 
 WORKDIR /var/www/html
 
-COPY src .
+COPY backend .
 
 EXPOSE 80

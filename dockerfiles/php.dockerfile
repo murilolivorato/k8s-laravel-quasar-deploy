@@ -2,7 +2,7 @@ FROM php:8.3.4-fpm-alpine
 
 WORKDIR /var/www/html
 
-COPY src .
+COPY backend .
 # Instalando extensões necessárias do PHP
 RUN apk add --no-cache postgresql-dev msmtp perl wget procps shadow libzip libpng libjpeg-turbo libwebp freetype icu
 
@@ -18,7 +18,7 @@ RUN apk add --no-cache --virtual build-essentials \
     docker-php-ext-install opcache && \
     docker-php-ext-install exif && \
     docker-php-ext-install zip && \
-    apk del build-essentials && rm -rf /usr/src/php*
+    apk del build-essentials && rm -rf /usr/backend/php*
 
 
 

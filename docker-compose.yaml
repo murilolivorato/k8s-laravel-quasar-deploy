@@ -1,5 +1,5 @@
 networks:
-  laravel_gke_deploy:
+  deploy_laravel_quasar_app:
 
 services:
   server:
@@ -20,15 +20,36 @@ services:
       - 80:80
       # - 443:443
     volumes:
-      - ./src:/var/www/html
+      - ./backend:/var/www/html
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - php
       - postgres
       - redis
-    container_name: laravel_gke_deploy
+    container_name: deploy_laravel_quasar_app
     networks:
-      - laravel_gke_deploy
+      - deploy_laravel_quasar_app
+
+  frontend:
+    build:
+      context: .
+      dockerfile: dockerfiles/quasar.dev.dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.quasar
+    environment:
+      - NODE_ENV=development
+      - HOST=0.0.0.0
+      - PORT=8080
+    depends_on:
+      - server
+    container_name: frontend_laravel_quasar
+    networks:
+      - deploy_laravel_quasar_app
+
   postgres:
     image: postgres:15.3-alpine
     container_name: postgres_laravel_gke
@@ -42,7 +63,7 @@ services:
     #    tmpfs:
     #      size: 134217728 # 128*2^20 bytes = 128Mb
     environment:
-      - POSTGRES_DB=laravel_gke_db
+      - POSTGRES_DB=laravel_quasar_db_app
       - POSTGRES_USER=test_user
       - POSTGRES_PASSWORD=pwd
     ports:
@@ -50,10 +71,10 @@ services:
     volumes:
       - /opt/postgres_data:/var/lib/postgresql/data
     networks:
-      - laravel_gke_deploy
+      - deploy_laravel_quasar_app
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: pgadmin_laravel_gke_deploy
+    container_name: pgadmin_deploy_laravel_quasar_app
     restart: always
     depends_on:
       - postgres
@@ -66,17 +87,17 @@ services:
     volumes:
       - /opt/pgadmin_data:/var/lib/pgadmin
     networks:
-      - laravel_gke_deploy
+      - deploy_laravel_quasar_app
 
   php:
     build:
       context: .
       dockerfile: dockerfiles/php.dockerfile
     volumes:
-      - ./src:/var/www/html:delegated
-    container_name: php_laravel_gke_deploy
+      - ./backend:/var/www/html:delegated
+    container_name: hp__deploy_laravel_quasar_app
     networks:
-      - laravel_gke_deploy
+      - deploy_laravel_quasar_app
     depends_on:
       - postgres
 
@@ -87,7 +108,7 @@ services:
     ports:
       - 6379:6379
     networks:
-      - laravel_gke_deploy
+      - deploy_laravel_quasar_app
     command: redis-server --appendonly yes --replica-read-only no
 
   composer:
@@ -95,34 +116,34 @@ services:
       context: ./dockerfiles
       dockerfile: composer.dockerfile
     volumes:
-      - ./src:/var/www/html
+      - ./backend:/var/www/html
     depends_on:
       - php
     networks:
-      - laravel_gke_deploy
+      - deploy_laravel_quasar_app
   artisan:
     build:
       context: .
       dockerfile: dockerfiles/php.dockerfile
     volumes:
-      - ./src:/var/www/html
+      - ./backend:/var/www/html
     entrypoint: ["php", "/var/www/html/artisan"]
     #depends_on:
     networks:
-      - laravel_gke_deploy
+      - deploy_laravel_quasar_app
     depends_on:
     - php
   scheduler:
     build:
       context: .
       dockerfile: dockerfiles/php.dockerfile
-    container_name: scheduler_laravel_gke_deploy
+    container_name: cheduler__deploy_laravel_quasar_app
     volumes:
-      - ./src:/var/www/html
+      - ./backend:/var/www/html
     working_dir: /var/www/html
     entrypoint: [ "php", "artisan", "schedule:work" ]
     networks:
-      - laravel_gke_deploy
+      - deploy_laravel_quasar_app
   mailhog:
     image: mailhog/mailhog:latest
     container_name: mail_gke_deploy
@@ -130,7 +151,7 @@ services:
       - 1025:1025
       - 8025:8025
     networks:
-      - laravel_gke_deploy
+      - deploy_laravel_quasar_app
 
 
 

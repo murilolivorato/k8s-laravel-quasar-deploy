@@ -1,6 +1,6 @@
 FROM node:21
 WORKDIR /var/www/html
-COPY src/package.json  .
+COPY backend/package.json  .
 RUN npm install
 # Add your source files
 COPY . .

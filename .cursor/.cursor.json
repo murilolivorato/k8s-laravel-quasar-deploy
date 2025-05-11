@@ -1,0 +1,71 @@
+{
+  "project": {
+    "name": "Laravel Quasar Fullstack",
+    "description": "Fullstack application with Laravel backend and Quasar frontend",
+    "version": "1.0.0"
+  },
+  "workspaces": {
+    "backend": {
+      "path": "backend",
+      "type": "php",
+      "framework": "laravel",
+      "extensions": [
+        "bmewburn.vscode-intelephense-client",
+        "onecentlin.laravel-blade",
+        "shufo.vscode-blade-formatter"
+      ]
+    },
+    "frontend": {
+      "path": "frontend",
+      "type": "javascript",
+      "framework": "quasar",
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "vue.volar",
+        "vue.vscode-typescript-vue-plugin",
+        "quasar.quasar-vscode-extension"
+      ]
+    }
+  },
+  "settings": {
+    "editor": {
+      "formatOnSave": true,
+      "tabSize": 2,
+      "insertSpaces": true
+    },
+    "search": {
+      "exclude": [
+        "**/node_modules",
+        "**/vendor",
+        "**/storage",
+        "**/public/build",
+        "**/dist",
+        "**/.git"
+      ]
+    },
+    "files": {
+      "exclude": {
+        "**/.git": true,
+        "**/node_modules": true,
+        "**/vendor": true,
+        "**/storage": true,
+        "**/public/build": true,
+        "**/dist": true,
+        "**/.env": true,
+        "**/.env.*": true
+      }
+    }
+  },
+  "tasks": {
+    "backend": {
+      "serve": "php artisan serve",
+      "migrate": "php artisan migrate",
+      "test": "php artisan test"
+    },
+    "frontend": {
+      "dev": "quasar dev",
+      "build": "quasar build",
+      "test": "quasar test"
+    }
+  }
+} 
