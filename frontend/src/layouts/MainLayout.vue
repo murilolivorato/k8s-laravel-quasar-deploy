@@ -1,6 +1,6 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+    <q-header elevated class="bg-primary text-white">
       <q-toolbar>
         <q-btn
           flat
@@ -15,7 +15,16 @@
           Quasar App
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <q-space />
+
+        <template v-if="authStore.isAuthenticated">
+          <q-btn flat dense round icon="person" :label="authStore.user?.name" />
+          <q-btn flat dense round icon="logout" @click="logout" />
+        </template>
+        <template v-else>
+          <q-btn flat dense round to="/login" label="Login" />
+          <q-btn flat dense round to="/register" label="Register" />
+        </template>
       </q-toolbar>
     </q-header>
 
@@ -48,6 +57,9 @@
 <script setup>
 import { ref } from 'vue'
 import EssentialLink from 'components/EssentialLink.vue'
+import { useAuthStore } from 'stores/auth'
+import { useRouter } from 'vue-router'
+import { useQuasar } from 'quasar'
 
 const linksList = [
   {
@@ -95,8 +107,27 @@ const linksList = [
 ]
 
 const leftDrawerOpen = ref(false)
+const authStore = useAuthStore()
+const router = useRouter()
+const $q = useQuasar()
 
 function toggleLeftDrawer () {
   leftDrawerOpen.value = !leftDrawerOpen.value
+}
+
+const logout = async () => {
+  try {
+    await authStore.logout()
+    $q.notify({
+      color: 'positive',
+      message: 'Logged out successfully',
+    })
+    router.push('/login')
+  } catch (err) {
+    $q.notify({
+      color: 'negative',
+      message: err.message || 'Logout failed',
+    })
+  }
 }
 </script>
