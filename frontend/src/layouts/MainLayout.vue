@@ -19,11 +19,19 @@
 
         <template v-if="authStore.isAuthenticated">
           <q-btn flat dense round icon="person" :label="authStore.user?.name" />
-          <q-btn flat dense round icon="logout" @click="logout" />
+          <q-btn 
+            flat 
+            dense 
+            round 
+            icon="logout" 
+            label="Logout"
+            @click="logout"
+            class="q-ml-sm"
+          />
         </template>
         <template v-else>
-          <q-btn flat dense round to="/login" label="Login" />
-          <q-btn flat dense round to="/register" label="Register" />
+          <q-btn flat dense round to="/auth/login" label="Login" />
+          <q-btn flat dense round to="/auth/register" label="Register" />
         </template>
       </q-toolbar>
     </q-header>
@@ -34,9 +42,39 @@
       bordered
     >
       <q-list>
-        <q-item-label
-          header
+        <q-item-label header>
+          Menu
+        </q-item-label>
+
+        <!-- Add user info at the top of drawer -->
+        <q-item v-if="authStore.isAuthenticated">
+          <q-item-section avatar>
+            <q-icon name="person" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ authStore.user?.name }}</q-item-label>
+            <q-item-label caption>{{ authStore.user?.email }}</q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <!-- Add logout button in drawer -->
+        <q-item
+          v-if="authStore.isAuthenticated"
+          clickable
+          v-ripple
+          @click="logout"
         >
+          <q-item-section avatar>
+            <q-icon name="logout" />
+          </q-item-section>
+          <q-item-section>
+            Logout
+          </q-item-section>
+        </q-item>
+
+        <q-separator />
+
+        <q-item-label header>
           Essential Links
         </q-item-label>
 
@@ -103,6 +141,12 @@ const linksList = [
     caption: 'Community Quasar projects',
     icon: 'favorite',
     link: 'https://awesome.quasar.dev'
+  },
+  {
+    title: 'User Management',
+    caption: 'Manage system users',
+    icon: 'people',
+    link: '/users'
   }
 ]
 
@@ -117,17 +161,28 @@ function toggleLeftDrawer () {
 
 const logout = async () => {
   try {
+    console.log('Starting logout process...')
     await authStore.logout()
+    console.log('Logout successful, redirecting...')
     $q.notify({
-      color: 'positive',
+      type: 'positive',
       message: 'Logged out successfully',
+      position: 'top'
     })
-    router.push('/login')
+    router.push('/auth/login')
   } catch (err) {
+    console.error('Logout error:', err)
     $q.notify({
-      color: 'negative',
+      type: 'negative',
       message: err.message || 'Logout failed',
+      position: 'top'
     })
   }
 }
 </script>
+
+<style scoped>
+.q-drawer {
+  background: #f5f5f5;
+}
+</style>

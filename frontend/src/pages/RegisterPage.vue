@@ -1,58 +1,117 @@
 <template>
-  <q-page class="flex flex-center bg-grey-2">
-    <q-card class="register-card q-pa-md">
-      <q-card-section class="text-center">
-        <div class="text-h5 q-mb-md">Register</div>
-      </q-card-section>
-
+  <q-page class="flex flex-center">
+    <q-card class="register-card">
       <q-card-section>
+        <div class="text-h6 text-center q-mb-md">Create Account</div>
+        
         <q-form @submit="onSubmit" class="q-gutter-md">
+          <!-- Name Field -->
           <q-input
             v-model="form.name"
-            label="Name"
+            label="Full Name"
             :rules="[val => !!val || 'Name is required']"
             outlined
-          />
+          >
+            <template v-slot:prepend>
+              <q-icon name="person" />
+            </template>
+          </q-input>
 
+          <!-- Email Field -->
           <q-input
             v-model="form.email"
             label="Email"
             type="email"
-            :rules="[val => !!val || 'Email is required']"
+            :rules="[
+              val => !!val || 'Email is required',
+              val => isValidEmail(val) || 'Invalid email format'
+            ]"
             outlined
-          />
+          >
+            <template v-slot:prepend>
+              <q-icon name="email" />
+            </template>
+          </q-input>
 
+          <!-- Phone Field -->
+          <q-input
+            v-model="form.phone"
+            label="Phone"
+            outlined
+          >
+            <template v-slot:prepend>
+              <q-icon name="phone" />
+            </template>
+          </q-input>
+
+          <!-- Password Field -->
           <q-input
             v-model="form.password"
             label="Password"
-            type="password"
-            :rules="[val => !!val || 'Password is required']"
+            :type="isPwd ? 'password' : 'text'"
+            :rules="[
+              val => !!val || 'Password is required',
+              val => val.length >= 8 || 'Password must be at least 8 characters'
+            ]"
             outlined
-          />
+          >
+            <template v-slot:prepend>
+              <q-icon name="lock" />
+            </template>
+            <template v-slot:append>
+              <q-icon
+                :name="isPwd ? 'visibility_off' : 'visibility'"
+                class="cursor-pointer"
+                @click="isPwd = !isPwd"
+              />
+            </template>
+          </q-input>
 
+          <!-- Password Confirmation Field -->
           <q-input
             v-model="form.password_confirmation"
             label="Confirm Password"
-            type="password"
+            :type="isPwdConfirm ? 'password' : 'text'"
             :rules="[
               val => !!val || 'Please confirm your password',
               val => val === form.password || 'Passwords do not match'
             ]"
             outlined
+          >
+            <template v-slot:prepend>
+              <q-icon name="lock" />
+            </template>
+            <template v-slot:append>
+              <q-icon
+                :name="isPwdConfirm ? 'visibility_off' : 'visibility'"
+                class="cursor-pointer"
+                @click="isPwdConfirm = !isPwdConfirm"
+              />
+            </template>
+          </q-input>
+
+          <!-- Terms and Conditions -->
+          <q-checkbox
+            v-model="form.accept_terms"
+            label="I accept the terms and conditions"
+            :rules="[val => val || 'You must accept the terms and conditions']"
           />
 
-          <div>
-            <q-btn 
-              label="Register" 
-              type="submit" 
-              color="primary" 
+          <!-- Submit Button -->
+          <div class="row justify-center q-mt-md">
+            <q-btn
+              label="Register"
+              type="submit"
+              color="primary"
+              :loading="loading"
               class="full-width"
-              size="lg"
             />
           </div>
 
+          <!-- Login Link -->
           <div class="text-center q-mt-sm">
-            <router-link to="/login" class="text-primary">Already have an account? Login</router-link>
+            Already have an account?
+            <router-link to="/login" class="text-primary">Login here</router-link>
           </div>
         </q-form>
       </q-card-section>
@@ -63,33 +122,65 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from 'stores/auth'
 import { useQuasar } from 'quasar'
+import { api } from 'src/boot/axios'
 
 const router = useRouter()
-const authStore = useAuthStore()
 const $q = useQuasar()
 
+// Form state
 const form = ref({
   name: '',
   email: '',
+  phone: '',
   password: '',
   password_confirmation: '',
+  accept_terms: false
 })
 
+// UI state
+const loading = ref(false)
+const isPwd = ref(true)
+const isPwdConfirm = ref(true)
+
+// Validation
+const isValidEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(email)
+}
+
+// Form submission
 const onSubmit = async () => {
+  loading.value = true
   try {
-    await authStore.register(form.value)
-    $q.notify({
-      color: 'positive',
-      message: 'Registered successfully',
+    const { data } = await api.post('/api/register', {
+      name: form.value.name,
+      email: form.value.email,
+      phone: form.value.phone,
+      password: form.value.password,
+      password_confirmation: form.value.password_confirmation
     })
+
+    // Store the token
+    localStorage.setItem('token', data.token)
+
+    // Show success message
+    $q.notify({
+      type: 'positive',
+      message: 'Registration successful! Welcome aboard.',
+      position: 'top'
+    })
+
+    // Redirect to dashboard
     router.push('/')
-  } catch (error) {
+  } catch (err) {
     $q.notify({
-      color: 'negative',
-      message: error.message || 'Registration failed',
+      type: 'negative',
+      message: err.response?.data?.message || 'Registration failed. Please try again.',
+      position: 'top'
     })
+  } finally {
+    loading.value = false
   }
 }
 </script>
@@ -98,9 +189,12 @@ const onSubmit = async () => {
 .register-card {
   width: 100%;
   max-width: 400px;
+  padding: 20px;
 }
 
-.bg-grey-2 {
-  background: #f5f5f5;
+@media (max-width: 599px) {
+  .register-card {
+    margin: 0 16px;
+  }
 }
 </style> 

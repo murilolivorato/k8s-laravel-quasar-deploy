@@ -4,15 +4,31 @@ import { api } from 'src/boot/axios'
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
-    token: localStorage.getItem('token') || null,
+    token: null,
   }),
 
   getters: {
-    isAuthenticated: (state) => !!state.token,
+    isAuthenticated: (state) => !!state.token && !!state.user,
     getUser: (state) => state.user,
   },
 
   actions: {
+    async initialize() {
+      const token = localStorage.getItem('token')
+      if (token) {
+        try {
+          const { data } = await api.get('/api/user')
+          this.token = token
+          this.user = data
+        } catch (err) {
+          console.error('Failed to initialize auth:', err)
+          this.token = null
+          this.user = null
+          localStorage.removeItem('token')
+        }
+      }
+    },
+
     async login(credentials) {
       try {
         const { data } = await api.post('/api/login', credentials)
@@ -39,12 +55,23 @@ export const useAuthStore = defineStore('auth', {
 
     async logout() {
       try {
-        await api.post('/api/logout')
+        if (!this.token) {
+          throw new Error('No token found')
+        }
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${this.token}`
+          }
+        }
+
+        await api.post('/api/logout', {}, config)
+      } catch (error) {
+        console.error('Logout error:', error)
+      } finally {
         this.token = null
         this.user = null
         localStorage.removeItem('token')
-      } catch (error) {
-        console.error('Logout error:', error)
       }
     },
 
@@ -59,6 +86,12 @@ export const useAuthStore = defineStore('auth', {
         localStorage.removeItem('token')
         throw error
       }
+    },
+
+    async forceLogout() {
+      this.token = null
+      this.user = null
+      localStorage.removeItem('token')
     },
   },
 }) 

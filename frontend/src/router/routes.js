@@ -1,25 +1,42 @@
 const routes = [
   {
     path: '/',
-    component: () => import('../layouts/MainLayout.vue'),
-    meta: { requiresAuth: true },
-    children: [
-      { path: '', component: () => import('../pages/IndexPage.vue') },
-    ]
+    redirect: '/auth/login'
   },
   {
-    path: '/',
-    component: () => import('../layouts/AuthLayout.vue'),
+    path: '/auth',
+    component: () => import('layouts/AuthLayout.vue'),
     children: [
       {
         path: 'login',
-        component: () => import('../pages/LoginPage.vue'),
-        meta: { guest: true }
+        component: () => import('pages/LoginPage.vue')
       },
       {
         path: 'register',
-        component: () => import('../pages/RegisterPage.vue'),
-        meta: { guest: true }
+        component: () => import('pages/RegisterPage.vue')
+      }
+    ]
+  },
+  {
+    path: '/admin',
+    component: () => import('layouts/AdminLayout.vue'),
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        redirect: '/admin/dashboard'
+      },
+      {
+        path: 'dashboard',
+        component: () => import('pages/admin/DashboardPage.vue')
+      },
+      {
+        path: 'users',
+        component: () => import('pages/admin/UsersPage.vue')
+      },
+      {
+        path: 'roles',
+        component: () => import('pages/admin/RolesPage.vue')
       }
     ]
   },

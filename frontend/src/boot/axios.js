@@ -3,24 +3,62 @@ import axios from 'axios'
 
 // Be careful when using SSR for cross-request state pollution
 // due to creating a Singleton instance here;
-// If any client changes this (global) instance, it might be a
+// If any client changes this (global), it might be a
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
 const api = axios.create({
-  baseURL: 'http://localhost:80',
-  withCredentials: true,
+  baseURL: process.env.API_URL || 'http://localhost',
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest'
+  },
+  withCredentials: true
 })
 
+// Add a request interceptor to log all requests
 api.interceptors.request.use(
-  (config) => {
+  config => {
     const token = localStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
+    
+    console.log('Making request:', {
+      url: config.url,
+      method: config.method,
+      headers: config.headers,
+      hasToken: !!token
+    })
+    
     return config
   },
-  (error) => {
+  error => {
+    console.error('Request error:', error)
+    return Promise.reject(error)
+  }
+)
+
+// Add a response interceptor to log all responses
+api.interceptors.response.use(
+  response => {
+    console.log('Response received:', {
+      url: response.config.url,
+      status: response.status,
+      data: response.data,
+      headers: response.headers
+    })
+    return response
+  },
+  error => {
+    console.error('Response error:', {
+      url: error.config?.url,
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message,
+      headers: error.response?.headers
+    })
     return Promise.reject(error)
   }
 )
