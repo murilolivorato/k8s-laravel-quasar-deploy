@@ -31,36 +31,53 @@
         </q-card>
       </div>
 
-      <!-- Charts -->
+      <!-- Role Distribution -->
       <div class="col-12 col-md-6">
         <q-card>
           <q-card-section>
             <div class="text-h6">Role Distribution</div>
-            <div class="q-pa-md">
-              <canvas ref="roleChart"></canvas>
-            </div>
+            <q-list>
+              <q-item v-for="role in stats.role_distribution" :key="role.name">
+                <q-item-section>
+                  <q-item-label>{{ role.name }}</q-item-label>
+                  <q-item-label caption>{{ role.count }} users</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
           </q-card-section>
         </q-card>
       </div>
 
+      <!-- Registration Trend -->
       <div class="col-12 col-md-6">
         <q-card>
           <q-card-section>
-            <div class="text-h6">User Registration Trend</div>
-            <div class="q-pa-md">
-              <canvas ref="registrationChart"></canvas>
-            </div>
+            <div class="text-h6">Recent Registrations</div>
+            <q-list>
+              <q-item v-for="trend in stats.registration_trend?.slice(-5)" :key="trend.date">
+                <q-item-section>
+                  <q-item-label>{{ formatDate(trend.date) }}</q-item-label>
+                  <q-item-label caption>{{ trend.count }} new registrations</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
           </q-card-section>
         </q-card>
       </div>
 
+      <!-- Login Activity -->
       <div class="col-12 col-md-6">
         <q-card>
           <q-card-section>
-            <div class="text-h6">Login Activity</div>
-            <div class="q-pa-md">
-              <canvas ref="loginChart"></canvas>
-            </div>
+            <div class="text-h6">Recent Login Activity</div>
+            <q-list>
+              <q-item v-for="activity in stats.login_activity?.slice(-5)" :key="activity.date">
+                <q-item-section>
+                  <q-item-label>{{ formatDate(activity.date) }}</q-item-label>
+                  <q-item-label caption>{{ activity.count }} logins</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
           </q-card-section>
         </q-card>
       </div>
@@ -112,10 +129,6 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useQuasar } from 'quasar'
 import { api } from 'src/boot/axios'
-import { Chart, registerables } from 'chart.js'
-
-// Register all Chart.js components
-Chart.register(...registerables)
 
 export default {
   name: 'DashboardPage',
@@ -123,16 +136,12 @@ export default {
     const $q = useQuasar()
     const stats = ref({})
     const loading = ref(false)
-    const roleChart = ref(null)
-    const registrationChart = ref(null)
-    const loginChart = ref(null)
 
     const fetchStats = async () => {
       try {
         loading.value = true
         const response = await api.get('/api/analytics/dashboard')
         stats.value = response.data
-        updateCharts()
       } catch (error) {
         console.error('Error fetching stats:', error)
         $q.notify({
@@ -142,75 +151,6 @@ export default {
         })
       } finally {
         loading.value = false
-      }
-    }
-
-    const updateCharts = () => {
-      // Destroy existing charts before creating new ones
-      if (roleChart.value) {
-        const existingChart = Chart.getChart(roleChart.value)
-        if (existingChart) {
-          existingChart.destroy()
-        }
-      }
-      if (registrationChart.value) {
-        const existingChart = Chart.getChart(registrationChart.value)
-        if (existingChart) {
-          existingChart.destroy()
-        }
-      }
-      if (loginChart.value) {
-        const existingChart = Chart.getChart(loginChart.value)
-        if (existingChart) {
-          existingChart.destroy()
-        }
-      }
-
-      // Create new charts
-      if (roleChart.value) {
-        const roleCtx = roleChart.value.getContext('2d')
-        new Chart(roleCtx, {
-          type: 'pie',
-          data: {
-            labels: stats.value.role_distribution?.map(r => r.name) || [],
-            datasets: [{
-              data: stats.value.role_distribution?.map(r => r.count) || [],
-              backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
-            }]
-          }
-        })
-      }
-
-      if (registrationChart.value) {
-        const regCtx = registrationChart.value.getContext('2d')
-        new Chart(regCtx, {
-          type: 'line',
-          data: {
-            labels: stats.value.registration_trend?.map(t => t.date) || [],
-            datasets: [{
-              label: 'New Registrations',
-              data: stats.value.registration_trend?.map(t => t.count) || [],
-              borderColor: '#36A2EB',
-              tension: 0.1
-            }]
-          }
-        })
-      }
-
-      if (loginChart.value) {
-        const loginCtx = loginChart.value.getContext('2d')
-        new Chart(loginCtx, {
-          type: 'line',
-          data: {
-            labels: stats.value.login_activity?.map(a => a.date) || [],
-            datasets: [{
-              label: 'Logins',
-              data: stats.value.login_activity?.map(a => a.count) || [],
-              borderColor: '#4BC0C0',
-              tension: 0.1
-            }]
-          }
-        })
       }
     }
 
@@ -240,28 +180,12 @@ export default {
       const interval = setInterval(fetchStats, 300000)
       onUnmounted(() => {
         clearInterval(interval)
-        // Clean up charts when component is unmounted
-        if (roleChart.value) {
-          const chart = Chart.getChart(roleChart.value)
-          if (chart) chart.destroy()
-        }
-        if (registrationChart.value) {
-          const chart = Chart.getChart(registrationChart.value)
-          if (chart) chart.destroy()
-        }
-        if (loginChart.value) {
-          const chart = Chart.getChart(loginChart.value)
-          if (chart) chart.destroy()
-        }
       })
     })
 
     return {
       stats,
       loading,
-      roleChart,
-      registrationChart,
-      loginChart,
       formatBytes,
       formatDate,
       getLoadColor

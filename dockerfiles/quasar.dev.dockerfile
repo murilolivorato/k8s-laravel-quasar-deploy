@@ -8,8 +8,8 @@ RUN npm install -g @quasar/cli
 # First copy package files
 COPY frontend/package*.json ./
 
-# Install dependencies without running postinstall script
-RUN npm install --ignore-scripts
+# Install dependencies with specific chart.js version
+RUN npm install chart.js
 
 # Copy the rest of the frontend code
 COPY frontend/ .
