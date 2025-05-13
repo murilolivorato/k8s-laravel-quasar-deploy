@@ -21,7 +21,8 @@ gcloud config list
 docker build -t kube-laravel-app:v3 -f DockerFile.prod .
 docker build -t kube-laravel-app:v4 -f DockerFile.prod .
 
-docker build -t us-central1-docker.pkg.dev/curso-gcp-420816/gke-deploy/laravel_gke_deploy:v9 -f DockerFile.prod .
+docker build --no-cache -t ghcr.io/murilolivorato/deploy-laravel-quasar-app/backend:latest -f Dockerfile.backend .
+docker build --no-cache -t ghcr.io/murilolivorato/deploy-laravel-quasar-app/frontend:latest -f Dockerfile.frontend .
 
 
 # LIST IMAGE
