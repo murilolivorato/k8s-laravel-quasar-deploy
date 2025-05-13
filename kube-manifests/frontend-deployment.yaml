@@ -17,7 +17,8 @@ spec:
       - name: ghcr-secret
       containers:
       - name: frontend
-        image: ghcr.io/murilolivorato/deploy-laravel-quasar-app/frontend:latest
+        image: ghcr.io/murilolivorato/deploy-laravel-quasar-app/frontend:v1.0.1
+        imagePullPolicy: Always
         env:
         - name: VITE_API_URL
           value: "http://139.144.165.237"

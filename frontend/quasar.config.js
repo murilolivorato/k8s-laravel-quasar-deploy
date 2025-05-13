@@ -42,6 +42,11 @@ export default defineConfig((ctx) => {
         browser: [ 'es2022', 'firefox115', 'chrome115', 'safari14' ],
         node: 'node20'
       },
+      env: {
+        VITE_API_URL: ctx.dev 
+          ? 'http://localhost'  // Development URL
+          : 'http://139.144.165.237'  // Production URL
+      },
 
       vueRouterMode: 'hash', // available values: 'hash', 'history'
       // vueRouterBase,

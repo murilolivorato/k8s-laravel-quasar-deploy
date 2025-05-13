@@ -26,11 +26,20 @@ gcloud artifacts repositories create gke-deploy \
 gcloud config list
 
 # TAG THE IMAGES
-docker build -t kube-laravel-app:v3 -f DockerFile.prod .
-docker build -t kube-laravel-app:v4 -f DockerFile.prod .
+docker build -t ghcr.io/murilolivorato/deploy-laravel-quasar-app/frontend:v1.0.1 -f Dockerfile.frontend .
+
+and 
+
+docker push ghcr.io/murilolivorato/deploy-laravel-quasar-app/frontend:v1.0.1
+
+
+Or one command - 
 
 docker build --no-cache -t ghcr.io/murilolivorato/deploy-laravel-quasar-app/backend:latest -f Dockerfile.backend .
-docker build --no-cache -t ghcr.io/murilolivorato/deploy-laravel-quasar-app/frontend:latest -f Dockerfile.frontend .
+
+docker build --no-cache -t ghcr.io/murilolivorato/deploy-laravel-quasar-app/frontend:v1.0.1 -f Dockerfile.frontend .
+
+
 
 
 # LIST IMAGE
@@ -160,3 +169,31 @@ lk delete pod -n ingress-nginx --all
 lk get pods -n production -l app.kubernetes.io/name=laravel
 -> run command
 lk exec -n production -it {pod-name} -c app -- php artisan migrate
+
+
+# rollout
+lk rollout restart deployment -n production frontend
+lk rollout status deployment -n production frontend
+
+
+# image is chached ?
+add this to deployment ->
+imagePullPolicy: Always
+
+# after 
+lk rollout restart deployment -n production frontend
+
+# you can verify 
+lk get pods -n production -l app.kubernetes.io/name=frontend -o wide
+
+lk delete pod -n production frontend-5857fd7564-dv2dq
+lk set image deployment/frontend -n production frontend=ghcr.io/murilolivorato/deploy-laravel-quasar-app/frontend:latest@$(docker images ghcr.io/murilolivorato/deploy-laravel-quasar-app/frontend:latest --format "{{.ID}}")
+
+
+
+# is not updating the deploymen , even when change the image 
+## Delete the deployment (this will keep the pods running)
+lk delete deployment frontend -n production
+
+## Apply the new deployment
+lk apply -f kube-manifests/frontend-deployment.yaml

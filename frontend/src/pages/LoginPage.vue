@@ -2,7 +2,7 @@
   <q-page class="flex flex-center bg-grey-2">
     <q-card class="login-card q-pa-md">
       <q-card-section>
-        <div class="text-h6 text-center q-mb-md">Login</div>
+        <div class="text-h6 text-center q-mb-md">Login to your account</div>
         
         <q-form
           ref="formRef"
