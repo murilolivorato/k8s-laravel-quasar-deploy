@@ -17,6 +17,7 @@ COPY frontend/.npmrc ./
 COPY frontend/jsconfig.json ./
 COPY frontend/eslint.config.js ./
 COPY frontend/.prettierrc.json ./
+COPY frontend/.env ./
 
 # Install dependencies and build the application
 RUN npm install && \

@@ -1,3 +1,4 @@
+# kube-manifests/nginx-config.yaml
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -31,21 +32,17 @@ data:
       gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
 
       server {
-        listen 80 default_server;
-        listen [::]:80 default_server;
-
-        root /var/www/html/public;
+        listen 80;
         server_name _;
+        root /var/www/html/public;
 
-        location / {
+        # Only handle /api requests
+        location /api/ {
           if ($REQUEST_METHOD = 'OPTIONS') {
-            # add CORS headers
             add_header 'Access-Control-Allow-Origin' '$http_origin';
             add_header 'Access-Control-Allow-Methods' 'POST, GET, DELETE, PUT, PATCH, OPTIONS';
             add_header 'Access-Control-Allow-Headers' 'Origin, Authorization, Accept, Content-Type, X-Request-With, X-XSRF-TOKEN';
             add_header 'Access-Control-Allow-Credentials' 'true';
-
-            # Make this preflight request valid for 20 days
             add_header 'Access-Control-Max-Age' 1728000;
             add_header 'Content-Type' 'text/plain; charset=utf-8';
             add_header 'Content-Length' 0;
@@ -68,6 +65,11 @@ data:
           add_header 'Access-Control-Allow-Methods' 'POST, GET, DELETE, PUT, PATCH, OPTIONS' always;
           add_header 'Access-Control-Allow-Headers' 'Origin, Authorization, Accept, Content-Type, X-Request-With, X-XSRF-TOKEN' always;
           add_header 'Access-Control-Allow-Credentials' 'true' always;
+        }
+
+        # Return 404 for all other requests
+        location / {
+          return 404;
         }
       }
     }

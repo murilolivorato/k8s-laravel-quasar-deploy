@@ -4,18 +4,32 @@ metadata:
   name: laravel
   namespace: production
 spec:
-  ingressClassName: nginx  # New way instead of annotation
+  ingressClassName: nginx
   rules:
     - http:
         paths:
-          - path: /api/?(.*)
+          - path: /assets
             pathType: Prefix
             backend:
               service:
-                name: backend
+                name: frontend
                 port:
                   number: 80
-          - path: /?(.*)
+          - path: /icons
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: laravel
+                port:
+                  number: 80
+          - path: /
             pathType: Prefix
             backend:
               service:
