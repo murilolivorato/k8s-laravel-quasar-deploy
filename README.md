@@ -40,3 +40,19 @@ gcloud auth configure-docker
 docker push us-central1-docker.pkg.dev/curso-gcp-420816/gke-deploy/laravel_gke_deploy:v9
 
 
+# commands
+lk apply -f kube-manifests/namespaces.yaml
+lk apply -f kube-manifests/
+
+
+# Check pods in production namespace
+lk get pods -n production
+
+# Check pods in monitoring namespace
+lk get pods -n monitoring
+
+# Check services
+lk get services -n production
+
+# Check ingress
+lk get ingress -n production

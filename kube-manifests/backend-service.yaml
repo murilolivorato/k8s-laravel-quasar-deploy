@@ -1,13 +1,18 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend
+  name: laravel
+  namespace: production  # Add this line
+  labels:
+    app.kubernetes.io/name: laravel
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}' # Enable NEG for GKE Ingress
+    # cloud.google.com/backend-config: '{"default": "laravel-backendconfig"}' # Reference BackendConfig
 spec:
   selector:
-    app.kubernetes.io/name: backend
+    app.kubernetes.io/name: laravel
   ports:
-    - port: 80
+    - protocol: TCP
+      port: 80
       targetPort: 80
-      protocol: TCP
-      name: http
-  type: ClusterIP
+  type: LoadBalancer
