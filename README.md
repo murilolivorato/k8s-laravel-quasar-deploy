@@ -129,7 +129,8 @@ Let me know what aspects you'd like to emphasize or expand upon!
 ```bash
 # Clone the repositoryDashboard
 git clone <repository-url>
-cd deploy_laravel_quasar_app
+cd k8s-laravel-quasar-deploy
+
 
 # Start the containers
 docker-compose up -d --build
@@ -323,7 +324,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 <div align="center">
   <h3>⭐ Star This Repository ⭐</h3>
   <p>Your support helps us improve and maintain this project!</p>
-  <a href="https://github.com/murilolivorato/deploy_laravel_quasar_app/stargazers">
-    <img src="https://img.shields.io/github/stars/murilolivorato/deploy_laravel_quasar_app?style=social" alt="GitHub Stars">
+  <a href="https://github.com/murilolivorato/k8s-laravel-quasar-deploy
+/stargazers">
+    <img src="https://img.shields.io/github/stars/murilolivorato/k8s-laravel-quasar-deploy
+?style=social" alt="GitHub Stars">
   </a>
 </div>
