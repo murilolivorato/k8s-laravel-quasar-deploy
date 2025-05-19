@@ -302,22 +302,22 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 
 ### Login Page
-![Login Page](https://raw.githubusercontent.com/murilolivorato/deploy_laravel_quasar_app/main/docs/images/1.png)
+![Login Page](https://raw.githubusercontent.com/murilolivorato/k8s-laravel-quasar-deploy/main/docs/images/1.png)
 
 ### Dashboard
-![Dashboard](https://raw.githubusercontent.com/murilolivorato/deploy_laravel_quasar_app/main/docs/images/2.png)
+![Dashboard](https://raw.githubusercontent.com/murilolivorato/k8s-laravel-quasar-deploy/main/docs/images/2.png)
 
 ### List Users
-![List Users](https://raw.githubusercontent.com/murilolivorato/deploy_laravel_quasar_app/main/docs/images/3.png)
+![List Users](https://raw.githubusercontent.com/murilolivorato/k8s-laravel-quasar-deploy/main/docs/images/3.png)
 
 ### Add Users
-![Add Users](https://raw.githubusercontent.com/murilolivorato/deploy_laravel_quasar_app/main/docs/images/4.png)
+![Add Users](https://raw.githubusercontent.com/murilolivorato/k8s-laravel-quasar-deploy/main/docs/images/4.png)
 
 ### List Roles
-![List Roles](https://raw.githubusercontent.com/murilolivorato/deploy_laravel_quasar_app/main/docs/images/5.png)
+![List Roles](https://raw.githubusercontent.com/murilolivorato/k8s-laravel-quasar-deploy/main/docs/images/5.png)
 
 ### Register Users
-![Register Users](https://raw.githubusercontent.com/murilolivorato/deploy_laravel_quasar_app/main/docs/images/6.png)
+![Register Users](https://raw.githubusercontent.com/murilolivorato/k8s-laravel-quasar-deploy/main/docs/images/6.png)
 
 
 
