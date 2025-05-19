@@ -1,199 +1,329 @@
+# 🚀 Laravel + Quasar Kubernetes Deployment
+
+A modern, full-stack web application that combines the power of Laravel's robust backend framework with Quasar's elegant frontend framework. This application demonstrates a production-ready setup with Kubernetes deployment, featuring user authentication, role-based access control, and a responsive dashboard interface.
+
+## 🌟 Key Features
+
+- **Modern Tech Stack**
+  - Backend: Laravel 10.x (PHP)
+  - Frontend: Quasar Framework (Vue.js)
+  - Database: PostgreSQL
+  - Containerization: Docker
+  - Orchestration: Kubernetes
+
+- **Security & Authentication**
+  - JWT-based authentication
+  - Role-based access control (Admin, Editor roles)
+  - Secure password handling
+  - CSRF protection
+
+- **User Management**
+  - User registration and authentication
+  - Role-based permissions
+  - User activity tracking
+  - Account status management
+
+- **Production-Ready Infrastructure**
+  - Containerized deployment
+  - Kubernetes orchestration
+  - Load balancing
+  - High availability setup
+  - Automated scaling capabilities
+
+- **Development Features**
+  - Hot-reload development environment
+  - Docker-based local development
+  - Comprehensive API documentation
+  - Database migrations and seeding
+
+## 🎯 Use Cases
+
+This application serves as an excellent starting point for:
+- Enterprise web applications
+- Admin dashboards
+- User management systems
+- API-driven web applications
+- Learning modern full-stack development
+
+## 🛠️ Technology Stack
+
+### Backend
+- Laravel 10.x
+- PostgreSQL
+- JWT Authentication
+- RESTful API Architecture
+
+### Frontend
+- Quasar Framework
+- Vue.js 3
+- Composition API
+- Responsive Design
+
+### Infrastructure
+- Docker
+- Kubernetes
+- GitHub Container Registry
+- Nginx
+
+## 🔒 Security Features
+
+- JWT token-based authentication
+- Role-based access control
+- Secure password hashing
+- API rate limiting
+- CORS protection
+- Input validation and sanitization
+
+## 🚀 Performance
+
+- Optimized database queries
+- Efficient caching mechanisms
+- Load balancing
+- Containerized deployment
+- Scalable architecture
+
+## 📱 Responsive Design
+
+- Mobile-first approach
+- Cross-browser compatibility
+- Adaptive layouts
+- Touch-friendly interface
 
 
-# users 
-- email: admin@gmail.com,
-- password: password
+## 🎨 User Interface
 
-- email: editor@example.com,
-- password: password
+- Modern, clean design
+- Intuitive navigation
+- Responsive dashboard
+- User-friendly forms
+- Consistent styling
 
-## Run those commands
-- docker-compose up -d --build
-- docker-compose run --rm composer install
-- docker-compose run --rm artisan key:generate
+## 📊 Monitoring & Maintenance
 
+- Health check endpoints
+- Logging and monitoring
+- Error tracking
+- Performance metrics
+- Easy deployment updates
 
-## DEPLOY
+This project demonstrates best practices in modern web development, combining powerful backend capabilities with a sleek, responsive frontend, all while maintaining security, scalability, and maintainability. It's an excellent foundation for building enterprise-grade web applications or learning modern full-stack development practices.
 
-# Create the repository
-gcloud artifacts repositories create gke-deploy \
---repository-format=docker \
---location=us-central1 \
---description="Repository for GKE deploy artifacts"
+Would you like me to:
+1. Add more specific technical details about any component?
+2. Include information about specific features or implementations?
+3. Add more sections to the description?
 
+Let me know what aspects you'd like to emphasize or expand upon!
 
-# check region 
-gcloud config list
+## Prerequisites
 
-# TAG THE IMAGES
-docker build -t ghcr.io/murilolivorato/deploy-laravel-quasar-app/frontend:v1.0.1 -f Dockerfile.frontend .
+- Docker and Docker Compose
+- Kubernetes cluster (e.g., Linode Kubernetes Engine)
+- kubectl configured
+- GitHub Container Registry (ghcr.io) account
 
-and 
+## Quick Start
 
-docker push ghcr.io/murilolivorato/deploy-laravel-quasar-app/frontend:v1.0.1
+### 1. Local Development
 
+```bash
+# Clone the repositoryDashboard
+git clone <repository-url>
+cd deploy_laravel_quasar_app
 
-Or one command - 
+# Start the containers
+docker-compose up -d --build
 
-docker build --no-cache -t ghcr.io/murilolivorato/deploy-laravel-quasar-app/backend:latest -f Dockerfile.backend .
+# Install dependencies
+docker-compose run --rm composer install
 
-docker build --no-cache -t ghcr.io/murilolivorato/deploy-laravel-quasar-app/frontend:v1.0.1 -f Dockerfile.frontend .
+# Generate application key
+docker-compose run --rm artisan key:generate
 
+# Run migrations and seeders
+docker-compose run --rm artisan migrate --seed
+```
 
+### 2. Default Users
 
+The following users are created by the seeder:
 
-# LIST IMAGE
-docker images | grep kube-laravel-app
+- Admin User:
+  - Email: admin@gmail.com
+  - Password: password
 
-# TEST IMAGE
-docker run -p 80:80 kube-laravel-app:v4
-docker run -p 8080:8080 laravel_gcr_deploy:test
+- Editor User:
+  - Email: editor@example.com
+  - Password: password
 
+## Deployment
 
-# Authenticate with Google Cloud
-gcloud auth configure-docker
+### 1. Build and Push Images
 
-# Push the images to GCR
-docker push us-central1-docker.pkg.dev/curso-gcp-420816/gke-deploy/laravel_gke_deploy:v9
+```bash
+# Build frontend image
+docker build -t ghcr.io/<your_repository>/deploy-laravel-quasar-app/frontend:v1.0.1 -f Dockerfile.frontend .
 
+# Build backend image
+docker build -t ghcr.io/<your_repository>/deploy-laravel-quasar-app/backend:latest -f Dockerfile.backend .
 
-# commands
-lk apply -f kube-manifests/namespaces.yaml
-lk apply -f kube-manifests/
+# Push images to GitHub Container Registry
+docker push ghcr.io/<your_repository>/deploy-laravel-quasar-app/frontend:v1.0.1
+docker push ghcr.io/<your_repository>/deploy-laravel-quasar-app/backend:latest
+```
 
+### 2. Kubernetes Deployment
 
-# Check pods in production namespace
-lk get pods -n production
+```bash
+# Create namespace
+kubectl apply -f kube-manifests/namespaces.yaml
 
-# Check pods in monitoring namespace
-lk get pods -n monitoring
-
-# Check services
-lk get services -n production
-
-# Check ingress
-lk get ingress -n production
-
-# Debug:
-lk get pods -n production
-lk describe pod -n production -l app.kubernetes.io/name=laravel
-lk get services -n production
-lk get ingress -n production
-lk logs -n production -l app.kubernetes.io/name=laravel -c app
-
-# Clean up the old pods:
-lk delete pod -n production -l app.kubernetes.io/name=laravel
-
-# registre secret
-lk create secret docker-registry ghcr-secret \
+# Create registry secret
+kubectl create secret docker-registry ghcr-secret \
   --docker-server=ghcr.io \
-  --docker-username=murilolivorato \
-  --docker-password=<PASSWORD> \
+  --docker-username=<your-username> \
+  --docker-password=<your-password> \
   --namespace=production
 
-lk create secret docker-registry ghcr-auth --docker-server=ghcr.io --docker-username=murilolivorato --docker-password=<PASSWORD> --docker-email=murilolivorato@gmail.com
+# Deploy the application
+kubectl apply -f kube-manifests/
+```
 
-# Then apply the updated deployment:
-lk get secret ghcr-secret -n production
+### 3. Verify Deployment
 
-# Then apply the updated deployment:
-lk apply -f kube-manifests/backend-deployment.yaml
+```bash
+# Check pods status
+kubectl get pods -n production
 
-# Check the pods status:
-lk get pods -n production
+# Check services
+kubectl get services -n production
 
+# Check ingress
+kubectl get ingress -n production
+```
 
-# Delete the old deployment
-lk delete deployment laravel -n production
-lk delete deployment frontend -n production
+### 4. Run Migrations in Production
 
-# Delete any lingering pods
-lk delete pod -n production -l app.kubernetes.io/name=laravel
-lk delete pod -n production -l app.kubernetes.io/name=frontend
-
-
-# Check the pods status:
-lk get pods -n production -w
-
-# If you see any issues, let's check the pod details:
-lk describe pod -n production -l app.kubernetes.io/name=frontend
-
-# Check the logs of the frontend pod:
-lk logs -n production -l app.kubernetes.io/name=frontend
-
-# Verify the services are properly configured:
-lk get services -n production
-
-
-# Delete the pods to force them to use the new configuration
-lk delete pod -n production -l app.kubernetes.io/name=frontend
-
-# Or if you have curl installed in your cluster, you can test from inside:
-lk run -n production curl --rm -i --tty --image=curlimages/curl -- sh
-# Then inside the pod:
-curl http://frontend:80
-# Test the API endpoint
-curl http://frontend:80/api/health
-
-# connection 
-lk exec -it -n production postgres-5554d748d5-8rtjb -- psql -U test_user -d laravel_gke_db
-
+```bash
+# Get the backend pod name
+kubectl get pods -n production -l app.kubernetes.io/name=laravel
 
 # Run migrations
-lk exec -it -n production laravel-bc7f7f579-6kglp -c app -- php artisan migrate
+kubectl exec -n production -it <pod-name> -c app -- php artisan migrate
+```
 
-# If that doesn't work, we can try with --force
-lk exec -it -n production laravel-bc7f7f579-6kglp -c app -- php artisan migrate --force
+## Troubleshooting
 
-# Create a temporary pod to test the frontend service
-lk run -n production curl --rm -i --tty --image=curlimages/curl -- sh
-# Then inside the pod:
-curl http://frontend:80
+### Common Issues
 
-# First, let's check the Ingress controller service to get the external IP that will be used to access both frontend and backend:
-lk get svc -n ingress-nginx ingress-nginx-controller
+1. **Image Pull Issues**
+   ```bash
+   # Force image pull
+   kubectl rollout restart deployment -n production frontend
+   kubectl rollout restart deployment -n production backend
+   ```
 
-# Let's also check all services in the production namespace:
-get svc -n production
+2. **Pod Issues**
+   ```bash
+   # Check pod logs
+   kubectl logs -n production -l app.kubernetes.io/name=frontend
+   kubectl logs -n production -l app.kubernetes.io/name=laravel
 
-# Let's verify the Ingress status to see if it got an address:
-lk describe ingress -n production laravel
+   # Describe pod for more details
+   kubectl describe pod -n production -l app.kubernetes.io/name=frontend
+   ```
 
-# delete all ingress
-lk delete pod -n ingress-nginx --all
+3. **Database Connection**
+   ```bash
+   # Connect to database
+   kubectl exec -it -n production <postgres-pod-name> -- psql -U test_user -d laravel_gke_db
+   ```
+
+## Maintenance
+
+### Updating Images
+
+1. Build and push new images
+2. Update the deployment YAML with new image tags
+3. Apply the changes:
+   ```bash
+   kubectl apply -f kube-manifests/frontend-deployment.yaml
+   kubectl apply -f kube-manifests/backend-deployment.yaml
+   ```
+
+### Scaling
+
+```bash
+# Scale frontend deployment
+kubectl scale deployment frontend -n production --replicas=2
+
+# Scale backend deployment
+kubectl scale deployment backend -n production --replicas=2
+```
+
+## Architecture
+
+The application consists of:
+- Frontend: Quasar application served by Nginx
+- Backend: Laravel API
+- Database: PostgreSQL
+- All deployed on Kubernetes with proper networking and ingress configuration
+
+
+### Development Guidelines
+
+- Follow PSR-12 coding standards for PHP
+- Use ESLint and Prettier for frontend code
+- Write meaningful commit messages
+- Keep pull requests focused and small
+- Update tests and documentation
+
+### Contact
+
+For questions, suggestions, or collaboration:
+- **Author**: Murilo Livorato
+- **GitHub**: [murilolivorato](https://github.com/murilolivorato)
+- **linkedIn**: https://www.linkedin.com/in/murilo-livorato-80985a4a/
+
+
+## 🤝 Contributing
+
+We love your input! We want to make this project even better, so feel free to:
+- ⭐ Star the repository
+- 🐛 Report bugs
+- 💡 Suggest features
+- 📝 Improve documentation
+- 🔧 Submit pull requests
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+
+### Login Page
+![Login Page](docs/images/1.png)
+
+### Dashboard
+![Dashboard](docs/images/2.png)
+
+### List Users
+![List Users](docs/images/3.png)
+
+### Add Users
+![Add Users](docs/images/4.png)
+
+### List Roles
+![List Roles](docs/images/5.png)
+
+### Register Users
+![Register Users](docs/images/6.png)
 
 
 
-# Run migrations
--> get pod name
-lk get pods -n production -l app.kubernetes.io/name=laravel
--> run command
-lk exec -n production -it {pod-name} -c app -- php artisan migrate
-
-
-# rollout
-lk rollout restart deployment -n production frontend
-lk rollout status deployment -n production frontend
-
-
-# image is chached ?
-add this to deployment ->
-imagePullPolicy: Always
-
-# after 
-lk rollout restart deployment -n production frontend
-
-# you can verify 
-lk get pods -n production -l app.kubernetes.io/name=frontend -o wide
-
-lk delete pod -n production frontend-5857fd7564-dv2dq
-lk set image deployment/frontend -n production frontend=ghcr.io/murilolivorato/deploy-laravel-quasar-app/frontend:latest@$(docker images ghcr.io/murilolivorato/deploy-laravel-quasar-app/frontend:latest --format "{{.ID}}")
-
-
-
-# is not updating the deploymen , even when change the image 
-## Delete the deployment (this will keep the pods running)
-lk delete deployment frontend -n production
-
-## Apply the new deployment
-lk apply -f kube-manifests/frontend-deployment.yaml
+<div align="center">
+  <h3>⭐ Star This Repository ⭐</h3>
+  <p>Your support helps us improve and maintain this project!</p>
+  <a href="https://github.com/murilolivorato/deploy_laravel_quasar_app/stargazers">
+    <img src="https://img.shields.io/github/stars/murilolivorato/deploy_laravel_quasar_app?style=social" alt="GitHub Stars">
+  </a>
+</div>

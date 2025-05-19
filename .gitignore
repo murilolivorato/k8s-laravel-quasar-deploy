@@ -200,3 +200,11 @@ composer.phar
 # Docker volumes
 /opt/postgres_data/
 /opt/pgadmin_data/
+
+# IDE specific files
+.idea/
+.vscode/
+.cursor/
+.cursor.json
+.cursor-settings.json
+.cursor-cache/
